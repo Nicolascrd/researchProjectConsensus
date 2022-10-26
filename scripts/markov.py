@@ -1,21 +1,19 @@
 import math
+import numpy as np
 
 # constants
-k = 2  # how many requests per group of request
-n = 5  # number of nodes
-table = []  # Probabilities : table[i][j] probability of i colored states, j groups of requests
-# table contains -1 if the probability was not yet computed
-for i in range(n+1):
-    if i == 0:
-        table.append([0 for i in range(n+1)])
-    else:
-        table.append([])
-        for j in range(n+1):
-            table[i].append(-1)
+k = 3  # how many requests per group of request
+n = 10  # number of nodes
 
+# Probabilities : array[i][j] probability of i colored states, j groups of requests
+array = np.ndarray(shape=(n, n), dtype=float)
+array.fill(-1)  # table contains -1 if the probability was not yet computed
 
-table[1][1] = 1 # one node receives the information and emits one group of requests
-print(table)
+for i in range(n):
+    array[0][i] = 0
+
+array[1][1] = 1  # one node receives the information and emits one group of requests
+print(array)
 
 
 def Pcreqs(c, reqs):
@@ -39,8 +37,8 @@ def Pcreqs(c, reqs):
         print("less than 0 requests: impossible")
         return 0
 
-    if table[c][reqs] != -1:
-        return table[c][reqs]
+    if array[c][reqs] != -1:
+        return array[c][reqs]
     for t in range(k+1):
         if 0 > k-t or k-t > c-t-1:
             return 0
@@ -50,16 +48,11 @@ def Pcreqs(c, reqs):
             return 0
         res += math.comb(n-c+t, t) * math.comb(c-t-1, k-t) * \
             Pcreqs(c-t, reqs+1-t)
-
     return res / math.comb(n-1, k)
 
 
-table[2][1] = Pcreqs(2, 1)
-table[3][1] = Pcreqs(3, 1)
-table[4][1] = Pcreqs(4, 1)
-table[5][1] = Pcreqs(5, 1)
-table[2][2] = Pcreqs(2, 2)
-table[3][2] = Pcreqs(3, 2)
-table[4][2] = Pcreqs(4, 2)
-table[5][2] = Pcreqs(5, 2)
-print(table)
+for i in range(1, n):
+    for j in range(n):
+        array[i][j] = Pcreqs(i, j)
+
+print(array)
