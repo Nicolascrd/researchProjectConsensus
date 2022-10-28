@@ -60,3 +60,4 @@ for i in range(0, n+1):
     sumNoRequests += array[i][0]
 
 print("SUM", sumNoRequests)
+print("no consensus", 1-array[n][0])

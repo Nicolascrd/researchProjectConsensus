@@ -5,8 +5,8 @@ import numpy as np
 import sys
 
 # constants
-k = 2  # how many requests per group of request
-n = 5   # number of nodes
+k = 12  # how many requests per group of request
+n = 20   # number of nodes
 
 # Probabilities : array[i][j][k][l] probability of i colored nodes, j semi-colored nodes, k requests from colored nodes, l requests from semi-colored nodes
 
@@ -33,7 +33,7 @@ def Pcreqs(c, s, reqsc, reqss):
         return 0
     if reqsc < 0:
         return 0
-    if reqss > s:
+    if reqss > s+c:
         return 0
     if reqss < 0:
         return 0
@@ -125,12 +125,18 @@ for i in range(n+1):
             for v in range(n+1):
                 array[i][j][u][v] = Pcreqs(i, j, u, v)
 
+print(Pcreqs(0, 4, 0, 3))
+print(Pcreqs(3, 1, 3, 2))
 print(array)
 
 sumNoRequests = 0
+noConsensus = 0
 
 for i in range(0, n+1):
     for j in range(0, n+1):
         sumNoRequests += array[i][j][0][0]
+        if i+j != n :
+            noConsensus += array[i][j][0][0] 
 
 print("SUM", sumNoRequests)
+print("no consensus", noConsensus)
