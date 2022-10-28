@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 # constants
-k = 5  # how many requests per group of request
+k = 12  # how many requests per group of request
 n = 20  # number of nodes
 
 # Probabilities : array[i][j] probability of i colored states, j groups of requests
@@ -33,11 +33,11 @@ def Pcreqs(c, reqs):
         return array[c][reqs]
     for t in range(k+1):
         if 0 > k-t or k-t > c-t-1:
-            return 0
+            continue
         if 0 > t or 0 > n-c:
-            return 0
+            continue
         if 0 > k or k > n-1:
-            return 0
+            continue
 
         if reqs + 1 - t > 0: # no requests can't progress
             res += math.comb(n-c+t, t) * math.comb(c-t-1, k-t) * \
