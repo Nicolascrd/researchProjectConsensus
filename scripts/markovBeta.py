@@ -4,6 +4,8 @@ import math
 import numpy as np
 import sys
 from joblib import Parallel, delayed
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # constants
 # k = 8  # how many requests per group of request
@@ -170,10 +172,20 @@ def computeAll(n, ks):
         if n > k:
             resn.append(getNoConsensusProb(n, k))
         else:
-            resn.append(-1)
+            resn.append(0)
     return resn
 
 
 results = Parallel(n_jobs=-1)(delayed(computeAll)(n, ks) for n in nodes)
 
-print(results)
+X, Y = np.meshgrid(ks, nodes)
+
+fig = plt.figure()
+
+ax = plt.axes(projection="3d")
+ax.contour3D(X, Y, results, 80, cmap="viridis")
+ax.set_xlabel("k")
+ax.set_ylabel("n")
+ax.set_zlabel("epsilon")
+
+plt.show()
