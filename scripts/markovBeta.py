@@ -170,9 +170,13 @@ def computeAll(n, ks):
     resn = []
     for k in ks:
         if n > k:
-            resn.append(getNoConsensusProb(n, k))
+            g = getNoConsensusProb(n, k)
+            if g == 0:
+                resn.append(100)
+            else:
+                resn.append(-np.log(getNoConsensusProb(n, k)))
         else:
-            resn.append(0)
+            resn.append(100)
     return resn
 
 
@@ -183,9 +187,9 @@ X, Y = np.meshgrid(ks, nodes)
 fig = plt.figure()
 
 ax = plt.axes(projection="3d")
-ax.contour3D(X, Y, results, 80, cmap="viridis")
+ax.contour3D(X, Y, results, 200, cmap="viridis")
 ax.set_xlabel("k")
 ax.set_ylabel("n")
-ax.set_zlabel("epsilon")
-
+ax.set_zlabel("-log(epsilon)")
+ax.set_title("Probability of not reaching consensus")
 plt.show()
