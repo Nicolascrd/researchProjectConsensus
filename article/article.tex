@@ -1,0 +1,151 @@
+\documentclass[11pt, twocolumn]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{fdsymbol}
+\usepackage{textgreek}
+\usepackage{natbib}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{array}
+\usepackage{csquotes}
+\usepackage{caption}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\title{Decentralized state machine using Nakamoto (probabilistic) consensus\\\medskip Research Project 2022}
+\author{Nicolas COURAUD (nicolas.couraud@etu.emse.fr)\\École Nationale Supérieure des Mines de Saint-Étienne}
+
+\begin{document}
+
+\maketitle
+\onecolumn
+\section*{Abstract}
+
+As defined by Schneider \cite{stateMachine}, the state machine approach is a general method for implementing a fault-tolerant service
+by replicating servers and coordinating client interactions with server replicas.
+
+In this article, we look at state machines as a way to hold in multiple servers copies of the same record. That record, in our implementation, is a standard 
+key-value data structure (\href{https://go.dev/blog/maps}{a Go map}).
+
+We show how one can build a decentralized state machine using Nakamoto Consensus (in our implementation we used the Snowball consensus algorithm), and we study the advantages 
+and drawbacks of such an approach, compared to classical consensus algorithms like Raft \cite{understandable}.
+
+The implementation of the project is available at \href{https://github.com/Nicolascrd/distributed-state-machine}{github.com/Nicolascrd/distributed-state-machine}
+
+
+\tableofcontents
+\section{Traditional state machine replication}
+
+\subsection{Introduction}
+
+Introduction
+Introduction
+Introduction
+Introduction
+Introduction
+Introduction
+Introduction
+
+\subsection{Byzantine fault-tolerance with classical consensus}
+
+Byzantine
+Byzantine
+Byzantine
+Byzantine
+Byzantine
+Byzantine
+Byzantine
+Byzantine
+
+\section{Nakamoto (probabilistic) state machine replication}
+\subsection{The Nakamoto Consensus}
+
+The Naka consensus
+The Naka consensus
+The Naka consensus
+The Naka consensus
+The Naka consensus
+The Naka consensus
+The Naka consensus
+
+\subsection{My Nakamoto state machine implementation}
+
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+Nakamoto state machine
+
+\section{Performance Evaluation}
+\subsection{Probability of not reaching consensus in Nakamoto Consensus}
+
+Markov
+Markov
+Markov
+Markov
+Markov
+Markov
+Markov
+Markov
+Markov
+Markov
+
+\subsection{Number of requests required in regular functioning}
+
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+Number of requests
+
+\subsection{In case of a failure}
+
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+Failure ?
+
+\section{Conclusion}
+
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+Conclusion
+
+\bibliographystyle{alpha}
+\bibliography{biblio}
+
+\end{document}
