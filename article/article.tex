@@ -38,7 +38,7 @@
 As defined by Schneider \cite{stateMachine}, the state machine approach is a general method for implementing a fault-tolerant service
 by replicating servers and coordinating client interactions with server replicas.
 
-In this article, we look at state machines as a way to hold in multiple servers copies of the same record. That record, in my implementation, is a standard
+In this article, we look at state machines as a way to hold in multiple servers copies of the same record. In my implementation, this record is a standard
 key-value data structure (\href{https://go.dev/blog/maps}{a Go map}).
 
 I show how one can build a decentralized state machine using Nakamoto Consensus (in our implementation we used the Snowball consensus algorithm), and I study the advantages
@@ -58,8 +58,7 @@ Decentralized state machine systems are currently built, for the most part, arou
 In classical consensus, all of the nodes have to know each other. It is a permissioned model, which means that nodes have to get an approval to get into the network.
 That is very normal for private infrastructure but might not work for public infrastructure. Because all nodes must communicate with each other, the communication cost in generally considered high.
 
-Many classical consensus algorithms exists, the most famous one being Paxos \cite{parliament}. In my project, I used the Raft consensus algorithm \cite{understandable} because it has the same performances
-as Paxos, and is simpler to understand and implement.
+Many classical consensus algorithms exists, the most famous one being Paxos \cite{parliament}. In my project, I used the Raft consensus algorithm \cite{understandable} because it performs as well as Paxos, and is simpler to understand and implement.
 
 In Raft, each node can be either Leader, Follower or Candidate. In regular functioning, one node will be the leader and all the others will follow.
 The Leader node sends regular heartbeat requests to notify followers that it is still running. If they stop receiving the heartbeat, they switch to the follower status.
@@ -70,28 +69,26 @@ the leader returns an error message to the client. Otherwise, the leader updates
 
 When requesting a log, the client can also query any node in the network. The node just responds with the log at that number in the local record that it is holding.
 
-The only parameter than I included in my implementation is \emph{updateSystem}, which is a boolean. If True, if the leader sends heartbeats and a node does not reply, it will be eliminated from the network in the knowledge of all the nodes. This make it possible to
-crash a majority of nodes and still have the state machine running and usable on all the surviving nodes.
+The only parameter than I included in my implementation is \emph{updateSystem}, which is a boolean. If $True$, if the leader sends heartbeats and a node does not reply, 
+it will be eliminated from the network in the knowledge of all the nodes. This makes it possible to
+crash a majority of nodes and still have the state machine running and usable on all the surviving nodes. 
 
 \subsection{Byzantine fault-tolerance (BFT) with classical consensus}
 
 Contrary to Crash Fault, Byzantine Fault \cite{byzantine} is a type of failure where you consider that the node can fail in any possible way. In practice, it means that the node will stay up and can send malicious requests to
-interfere with the functioning of the network.
+interfere with network usage.
 
-My implementation of the state machine does not tolerate Byzantine Faults at all. With only one byzantine node, it already endangers the whole system. Indeed, the malicious node can "elect himself" in Raft, and then send heartbeats to all
-the node in the network, including the legitimate leader to become the leader de facto. Then, it can ignore requests, reply whatever it wants and write any log it wants in any node it wants.
-
-To tackle this issue, BFT algorithms were designed (such as \cite{pbft}). They include a layer of authentification, but are not necessarily much slower. However, there is a maximum number of malicious nodes that the algorithm can handle safely \cite{partialSynchrony}.
-For example, assuming partial synchrony of the nodes, consensus protocols can handle t crash failures with 2t+1 nodes but t byzantine failures with no less than 3t+1 nodes.
+The Raft consensus algorithm is not BFT. BFT algorithms (such as \cite{pbft}) include a layer of authentification, but are not necessarily much slower. However, there is a maximum number of malicious nodes that the algorithm can handle safely \cite{partialSynchrony}.
+For example, assuming partial synchrony of the nodes, consensus protocols can handle $t$ crash failures with $2t+1$ nodes but $t$ byzantine failures with no less than $3t+1$ nodes.
 
 \section{Nakamoto (probabilistic) state machine replication}
 \subsection{The Nakamoto Consensus}
 
 Nakamoto consensus was introduced with the bitcoin blockchain \cite{bitcoin}. Nakamoto consensus is probabilistic, which means that there is a probability ε that consensus is not reached.
-Of course, ε can be so low that crucial systems can be built relying Nakamoto consensus. Nakamoto consensus is open : nodes don't have to register or get an authorisation to enter the network.
+Of course, ε can be so low that crucial systems can be built relying on Nakamoto consensus. Nakamoto consensus is open : nodes don't have to register or get an authorisation to enter the network.
 Because nodes don't have to know every other node in the network and be able to communicate with everyone, Nakamoto is supposed to allow for greater scale in the network.
 
-Nakamoto consensus definetly shaked the consensus space in computer science with cryptocurrencies. In a different context, can it be useful as well ?
+Nakamoto consensus was a revolution in the consensus space with cryptocurrencies. How can we adapt the approach to build a state-machine with it ?
 
 \subsection{My Nakamoto state machine implementation}
 
@@ -99,17 +96,17 @@ To implement Nakamoto consensus, I chose the Snowball consensus algorithm \cite{
 
 The goal of snowball is to reach binary consensus starting from a network of nodes.
 
-I adapted the protocol to fit the needs of a decentralized state machine, because snowball is described in the context of building a payment system (because it is the basis of Avalanche, which is that payment system).
-Snowball is built by iterations, but I will only focus on Snowball, the last iteration, because it is the most interesting and the one I tested the performances in the end. Slush and Snowflake are interesting to understand
-where we are coming from, but no more.
+I adapted the protocol to fit the needs of a decentralized state machine, because snowball is described in the context of building a payment system (it is the basis of Avalanche, which is that payment system).
+Snowball is built by iterations, but I will only focus on the last iteration, because it is the most interesting and the one I tested the performances in the end. 
+The other two algorithms, Slush and Snowflake are only interesting to understand the protocol.
 
 I adapted Snowball in the following ways : Each node, in addition to having all the snowball consensus related data (not much), has a version of the record. All nodes starts with a empty record.
 Because it is the requirement for a decentralized state machine, each node can be queried to add a log to the record. Each node can also be queried to get one log in the record.
 
 The snowball protocol is triggered when the client asks to add a new log to an index that has not been touched yet. Indeed, the system works as if each index in the record corresponds to an independant snowball run.
 
-In snowball, each node has a counter of "confidence" which can tip towards one way or another. In my implementation, there is no binary consensus because the only value the system has is the log request.
-When receiving an add-log request, the node follows this sequence, in which $logToAdd$($string$) and $logPosition$($int$) are variables from the request (client or other node) and $record$($map[int]string$) and $cnt$($map[int]int$) are variables from the node memory:
+In snowball, each node has a counter of "confidence" which can tip towards one way or the other. In my implementation, there is no binary consensus because the only value the system has is the log request.
+When receiving an add-log request, the node follows this sequence, in which $logToAdd$(string) and $logPosition$(int) are variables from the request (client or other node) and $record$(map[int]string) and $cnt$(map[int]int) are variables from the node memory:
 \begin{algorithmic}
     \If{$record[logPosition]$ exists}
     \State reply $record[logPosition] == logToAdd$
@@ -125,7 +122,7 @@ initiateRequest corresponds to the following sequence :
 \begin{algorithmic}
     \While{$True$}
     \State $success \gets initiateQuery(req)$
-    \State $initiateQuery$ picks a sample in the network and queries it
+    \State ($initiateQuery$ picks a sample in the network and queries it)
     \If{$success$}
     \State $cnt[logPosition]++$
     \Else
@@ -148,14 +145,14 @@ initiateRequest corresponds to the following sequence :
     \item sampleSize (k) : the number of nodes that are queried each round
     \item majorityThreshold (α) : the number of nodes that have to reply successfully to consider that the query is successfull.
           (with $\alpha \geq \lceil k/2 \rceil$)
-    \item counterThreshold (β) : the threshold of successfull requests above which the node stops initiating requests and only replies with its content. (for one position)
+    \item CounterThreshold (β) : the threshold of successfull requests above which the node stops initiating requests and only replies with its content. (for one position)
 \end{itemize}
 
 \section{Performance Evaluation}
 \subsection{Probability of not reaching consensus in Nakamoto Consensus}
 
 In order to compare the performances of classical consensus and Nakamoto consensus, we need to be able to know the probability of not reaching consensus ε corresponding to the set
-of values (n, k, β). (α is not included because we assume no byzantine nodes in this part).
+of values (n, k, β). (α is not included because we assume no byzantine nodes in this section).
 
 The evolution of the system of nodes, for one position (one snowball run) is a Markov process. To compute to probability of not reaching consensus, we need to identify the possible states in the
 Markov process, the possible transitions and the transitions probabilities.
@@ -169,7 +166,7 @@ With β = 1, the state is (c, reqs) with :
 If the state converges to $c = n$, consensus is reached.
 If the state converges to $reqs = 0$, with $c \neq 0$, consensus is not reached when the snowball run is done.
 
-Then, the probability of reaching a certain state (1) is the sum of the probability of a different state (2) times the probability of going from state 2 to state 1.
+Then, the probability of reaching a certain state ($S1$) is the sum of the probability of a different state ($S2$) times the probability of going from state $S2$ to state $S1$.
 That is true if and only if states are transient, which is the case here because c can only grow and with c constant, reqs can only diminish.
 
 Therefore, the probability of being at state (c, reqs) is (the term in the sum is considered 0 if it does not make sense, which is the case for some t) :
@@ -200,7 +197,7 @@ To do the calculation, we assume that requests from semi-colored nodes resolve f
     \\ + \sum_{ts=0}^{k+1} {n-c-s+rs \choose tv}{s-rs+ts \choose ts}{c-ts-1 \choose k-rs-ts}P(c-ts, s-rs+ts, rc+1-ts, 0)
 \end{multline*}
 \\
-With these formulas, we can compute the probability of not reaching consensus : view Appendices
+With these formulas, we can compute the probability of not reaching consensus : view Appendices.
 The scripts which were used to compute the graphs in Appendix are available at \href{https://github.com/Nicolascrd/researchProjectConsensus}{github.com/Nicolascrd/researchProjectConsensus}
 
 \subsection{Number of requests required in regular functioning}
@@ -241,10 +238,12 @@ One thing the byzantine node cannot easily do in the Snowball implementation is 
 
 \section{Conclusion}
 
-We demonstrated that it was possible to build a decentralized state machine, that could be based on a Nakamoto consensus algorithm and had interesting properties.
-However, more research is required to use this approach at a greater scale.
+We demonstrated that it was possible to build a decentralized state machine, that could be based on a Nakamoto consensus algorithm and had interesting properties. 
+In normal running state, the number of requests to reach consensus is a function of $k * \beta$ whereas in Raft, the leader must handle $n-1$ request on its own. 
+Raft has one consensus for the whole system, whereas in Snowball to each value correspond a different consensus. For most usage, classical consensus is probably the way to go.
+It would be useful to lead some more research on the topic. 
 In particular, it would be interesting to approximate the value of ε $\forall n, k, \beta$. 
-Also, a comparison focused on Byzantine Fault Tolerance would be interesting. To do that one would need to use PBFT \cite{pbft} instead of the Raft.
+Also, a comparison focused on Byzantine Fault Tolerance would also be interesting. To do that one would need to use PBFT \cite{pbft} instead of the Raft.
 
 \onecolumn
 
