@@ -64,7 +64,7 @@ Many classical consensus algorithms exists, the most famous one being Paxos \cit
 In this project, I used the Raft consensus algorithm \cite{understandable} because it performs as well as Paxos, and is simpler to understand and implement.
 
 In Raft, each node can be either Leader, Follower or Candidate. In regular functioning, one node will be the leader and all the others will follow.
-The Leader node sends regular heartbeat requests to notify Followers that it is still running. If they stop receiving the heartbeat, they switch to the Candidate status.
+The Leader sends regular heartbeat requests to notify Followers that it is still running. If they stop receiving the heartbeat, they switch to the Candidate status, in which they ask other nodes to vote for them in order to become Leader.
 
 The client can ask any node to add a log to the record. A log, in my implementation, is just a string, corresponding to a unique number. Both are given by the client in his request to the state machine.
 If the client asks a node which is not the leader, the request is transfered to the leader. If there is already a log at the given number,
@@ -165,7 +165,7 @@ of values (n, k, β). (α is not included because we assume no byzantine nodes i
 The evolution of the system of nodes, for one position (one Snowball run), is a Markov process. To compute to probability of not reaching consensus, we need to identify the possible states in the
 Markov process, the possible transitions and the transitions probabilities.
 
-Servers are represented by nodes. A server which received the request to add the log is considered "colored". 
+Servers are represented by nodes. A server which received the request to add the log is considered "colored", otherwise it is considered "neutral". 
 
 \paragraph{β = 1}
 With β = 1, the state is (c, reqs) with :
@@ -205,8 +205,8 @@ We must separate requests in those two groups because a request cannot be direct
 Therefore the probabilities of hitting a colored node is smaller if the request comes from a colored node than from a semi-colored node.
 
 The term in the sums is considered 0 if it does not make sense.
-First sum represents a step of the resolution of one group of requests, coming from a semi-colored node, with tc (ts) the number of colored (semi colored) nodes in the sample.
-Second sum represents a step of the resolution of one group of requests, coming from a colored node.
+The first sum represents a step of the resolution of one group of requests, coming from a semi-colored node, with tc (ts) the number of colored (semi colored) nodes in the sample.
+The second sum represents a step of the resolution of one group of requests, coming from a colored node.
 To do the calculation, we assume that requests from semi-colored nodes resolve faster.
 \begin{multline*}
     P(c, s, rc, rs) = \\ \sum_{tv=0}^{k+1}\sum_{ts=0}^{k+1} {n-c-s+tv \choose tv}{s-tv-1+ts \choose ts}{c-ts \choose k-tv-ts}P(c-ts, s-tv+ts, rc-ts, rs+1-tv)
@@ -224,7 +224,7 @@ The scripts which were used to compute the graphs in Appendices are available at
 \subsection{Number of requests required in regular functioning}
 
 \paragraph{Raft (classical)}
-When the leader is up and giving instruction to all the followers, followers don't have to initiate requests.
+When the leader is up and giving instructions to all the followers, followers don't have to initiate requests.
 Therefore in normal functioning, the leader node will make $n-1$ requests every heartbeat.
 In addition to this, every client request will trigger $n-1$ requests from the leader, to update followers. If the request was directed from the client to a follower, one request is initiated
 by the follower to transfer the request to the leader.
@@ -246,9 +246,10 @@ With many nodes, nodes might tick "at the same time" and therefore candidate at 
 Overall the Raft is very efficient at managing crash failures.
 
 \paragraph{Fail-stop in Snowball}
-If a node crashs in Snowball, some add-log request will not find a majority and therefore the consensus will be slower and require more requests.
-However, in production, the Snowball state machine would include a mechanism to update the network knowledge among members, which can take the form of a Snowball run, and therefore continue as if no node had failed.
-Snowball is also very efficient at managing crash failures.
+With no system to update knowledge among participating nodes, nodes crashes can force nodes to use more requests to reach consensus. 
+Indeed, if in the sample there are enough crashed nodes to prevent the success of the request, the node will have to start a new group of requests. That requires a significant number of nodes to crash nonetheless.
+In production, the Snowball state machine would include a mechanism to update the network knowledge among members, which can take the form of a Snowball run, and therefore continue as if no node had failed.
+Snowball would then be very efficient at managing crash failures.
 
 \paragraph{Byzantine failures}
 The architecture required to test properly my implementations for byzantine failures goes beyond this project. But we can still think about the resilience of each implementation.
@@ -262,9 +263,9 @@ One thing the byzantine node cannot easily do in the Snowball implementation is 
 
 We demonstrated that it was possible to build a decentralized state machine, that could be based on a Nakamoto consensus algorithm and had interesting properties. 
 In normal running state, the number of requests to reach consensus with Snowball is a function of $k * \beta$ for each node. In Raft, the leader must handle $n-1$ request on its own. 
-Raft has one consensus for the whole system, whereas in Snowball to each value correspond a different consensus. For most applications, classical consensus is probably the way to go. Still, it would be useful to lead some more research on the topic. 
+Raft has one consensus for the whole system, whereas in Snowball to each value corresponds a different consensus run. For most applications, classical consensus is probably the way to go. Still, it would be useful to lead some more research on the topic. 
 In particular, it would be interesting to approximate the value of ε $\forall n, k, \beta$. 
-Also, a comparison focused on Byzantine Fault Tolerance would also be interesting. To do that one would need to use PBFT \cite{pbft} instead of the Raft.
+A comparison focused on Byzantine Fault Tolerance would also be interesting. To do that one would need to use PBFT \cite{pbft} instead of the Raft.
 
 \onecolumn
 
