@@ -126,16 +126,16 @@ Interactive consistency is a notion defined by M. Pease, R, Shostak, and L. Lamp
     It is not known, however, which processors are faulty. Suppose that the processors can communicate only by means of two-party messages.
     The communication medium is presumed to be fail-safe and of negligible delay. The sender of a message, moreover, is always identifiable by the receiver.
     Suppose also that each processor $p$ has some private value of information \(V_{p}\). [...]
-    The question is whether for given \(m, n \geqslant 0 \), it is possible to devise an algorithm based on an exchange of messages that will allow each nonfaulty processor $p$ to compute a vector of values with an element for each of the n processors, such that :
+    The question is whether for given \(m, n \geqslant 0 \), it is possible to devise an algorithm based on an exchange of messages that will allow each non-faulty processor $p$ to compute a vector of values with an element for each of the n processors, such that :
 
     \begin{itemize}
-        \item the nonfaulty processors compute exactly the same vector;
-        \item the element of this vector corresponding to a given nonfaulty processor is the private value of that processor.
+        \item the non-faulty processors compute exactly the same vector;
+        \item the element of this vector corresponding to a given non-faulty processor is the private value of that processor.
     \end{itemize}
 
-    Note that the algorithm need not reveal which processors are faulty, and that the elements of the computed vector corresponding to faulty processors may be arbitrary; it matters only that the nonfaulty processors compute exactly the same value for any given faulty processor.
-    We say that such an algorithm achieves interactive consistency, since it allows the nonfaulty processors to come to a consistent view of the values held by all the processors, including the faulty ones. The computed vector is called an interactive consistency (i.c.) vector. Once interactive consistency has been achieved, each nonfaulty processor can apply an averaging or filtering function to the i.c. vector, according to the needs of the application.
-    Since each nonfaulty processor applies this function to the same vector of values, an exact agreement is necessarily reached.
+    Note that the algorithm need not reveal which processors are faulty, and that the elements of the computed vector corresponding to faulty processors may be arbitrary; it matters only that the non-faulty processors compute exactly the same value for any given faulty processor.
+    We say that such an algorithm achieves interactive consistency, since it allows the non-faulty processors to come to a consistent view of the values held by all the processors, including the faulty ones. The computed vector is called an interactive consistency (i.c.) vector. Once interactive consistency has been achieved, each non-faulty processor can apply an averaging or filtering function to the i.c. vector, according to the needs of the application.
+    Since each non-faulty processor applies this function to the same vector of values, an exact agreement is necessarily reached.
 
 \end{displayquote}
 
@@ -244,7 +244,7 @@ However, not all generals are considered loyal. Some of them might be traitors t
 
 Formally, a byzantine process can have any arbitrary behaviour. We only assume that the receiver knows the identity of the sender of a message.
 
-In the paper, the problem is decribed as so :
+In the paper, the problem is described as so :
 \subparagraph{Setting}
 Given a system of n components, t of which are dishonest, and assuming only point-to-point channel between all the components.
 Whenever a component A tries to broadcast a value x, the other components are allowed to discuss with each other and verify the consistency of A's broadcast, and eventually settle on a common value y.
@@ -293,7 +293,7 @@ The closed interval \([2t, 2t+1]\) means that  \(2t \leqslant Nmin \leqslant 2t+
 
 One way of evaluating consensus protocols is to assess, for one system of processes, whether or not they resist a fail-stop failure, an omission failure and/or a byzantine failure. But if we want to be more precise in our assessment, for example to compare multiple Byzantine fault-tolerant protocol we need more criteria.
 
-Studying the performance of consensus algorithms is not easy, as reported in \cite{analysisperf} (“Consensus protocols are typically too complex for analytical approaches to performance evalution”) and \cite{failureDetection} limits the study to the pure speed of the protocol (providing that the consensus is indeed reached). According to Urban and Schiper \cite{comparing},
+Studying the performance of consensus algorithms is not easy, as reported in \cite{analysisperf} (“Consensus protocols are typically too complex for analytical approaches to performance evaluation”) and \cite{failureDetection} limits the study to the pure speed of the protocol (providing that the consensus is indeed reached). According to Urban and Schiper \cite{comparing},
 
 \begin{displayquote}
     Most of the time, consensus algorithms are evaluated using
@@ -318,7 +318,7 @@ Even if some papers had described the concept years before, the state-machine ap
 
 Using the state machine approach allows us to better assess the performance of consensus algorithm, because they are put in a situation where testing is easier : “Do I get the expected result when there is a crash fault / a byzantine fault on 1/2/n nodes in my system using this algorithm ? How long does it take ? ”
 
-The Andrew benchmark \cite{scaleperf} for example is used in the PBFT\footnote{Practical Byzantine Fault-Tolerance} paper \cite{pbft} to state that their replicated file system supporting NFS\footnote{Network File System} adds very little time cost compared to a standard NFS deamon.
+The Andrew benchmark \cite{scaleperf} for example is used in the PBFT\footnote{Practical Byzantine Fault-Tolerance} paper \cite{pbft} to state that their replicated file system supporting NFS\footnote{Network File System} adds very little time cost compared to a standard NFS daemon.
 
 \section{Review of some of the most popular consensus algorithms}
 \subsection{Paxos}
@@ -367,7 +367,7 @@ For example, if the leader is elected in one Paxos run and does not fail, he can
 
 Let's say we use Paxos to provide access to a distributed state machine.
 Therefore, computing a Paxos run each time the service is queried by a client would result in a significant amount of unecessary processing, compared to a leader-based process with Paxos runs only to tackle failures.
-Most of the time, variants of Paxos would be implemented, not the original Paxos mentionned as the Basic Protocol.
+Most of the time, variants of Paxos would be implemented, not the original Paxos mentioned as the Basic Protocol.
 
 Some people have since worked on other variants. Lamport himself worked on a Fast Paxos algorithm \cite{fastpaxos} (basically reducing the number of message delays when the information comes from a client query).
 
@@ -395,11 +395,11 @@ PFBT uses cryptography to authenticate the nodes in the exchange. In the basic v
 \subsection{Proof-of-Work}
 \label{sec:pow}
 
-Even if it is often refered as so, Proof-of-Work is not in itself a consensus algorithm. Proof-of-Work was at inception a denial-of-service counter-measure \cite{hashcash}. Proof-of-Work algorithms allow users to show that they computed some amount of work, for example when using a service.
+Even if it is often referred as so, Proof-of-Work is not in itself a consensus algorithm. Proof-of-Work was at inception a denial-of-service counter-measure \cite{hashcash}. Proof-of-Work algorithms allow users to show that they computed some amount of work, for example when using a service.
 
-Without Proof-of-Work, an attacker can potentially send millions of request to a service that has to process them in what is known as a denial-of-service attack. If the services requieres the request to contains a Proof-of-Work stamp, the attacker would need for example one second to compute each stamp, which would need a lot of power and time to do the attack, in practice avoiding this kind of attacks completely.
+Without Proof-of-Work, an attacker can potentially send millions of request to a service that has to process them in what is known as a denial-of-service attack. If the services requires the request to contain a Proof-of-Work stamp, the attacker would need for example one second to compute each stamp, which would need a lot of power and time to do the attack, in practice avoiding this kind of attacks completely.
 
-In the bitcoin blockchain \cite{bitcoin}, Proof-of-Work is used to build the consensus algorithm which consists in giving trust to the longest chain\footnote{Longest chain of blocks in the blockchain, see \cite{blockchain} or \cite{bitcoin} for details}. This is some times referred to as the Nakamoto consensus, like in \cite{proconsensus}. The longest chain can only be built if you have the majority of computing power on the network. 
+In the bitcoin blockchain \cite{bitcoin}, Proof-of-Work is used to build the consensus algorithm which consists in giving trust to the longest chain\footnote{Longest chain of blocks in the blockchain, see \cite{blockchain} or \cite{bitcoin} for details}. This is sometimes referred to as the Nakamoto consensus, like in \cite{proconsensus}. The longest chain can only be built if you have the majority of computing power on the network. 
 Economical rationality makes it that nodes want to play with the rules to win the newly created coins (when one block is mined, the successful node (miner) gets a compensation for his work), therefore “avoiding” the byzantine generals problem.
 
 The bitcoin network is permissionless, and theoretically, any number of byzantine nodes (without computing power) can join the network without affecting its security.
@@ -410,9 +410,9 @@ I included Proof-of-Work because it is the technology that allowed all the devel
 
 \subsection{Proof-of-Stake}
 The first occurrence of Proof-of-Stake can be found behind the cryptocurrency PPCoin (or PeerCoin) \cite{ppcoin}, a project receiving very little interest nowadays. However, the technology gained popularity over time and nowadays much more cryptocurrencies are based on Proof-of-Stake than on Proof-of-Work \cite{coinmarketcap}. 
-The second biggest cryptocurrency by market cap\footnote{Market capitalization (or market cap) is the total value of all the coins that have been mined. It is calculated by multiplying the number of coins in circulation by the current market price of a single coin.}, Ethereum, even moved from Proof-of-Work to Proof-of-Stake not long before these lignes were written, in one of the biggest event the world of crypto has ever seen (known as The Merge).
+The second biggest cryptocurrency by market cap\footnote{Market capitalization (or market cap) is the total value of all the coins that have been mined. It is calculated by multiplying the number of coins in circulation by the current market price of a single coin.}, Ethereum, even moved from Proof-of-Work to Proof-of-Stake not long before these lines were written, in one of the biggest event the world of crypto has ever seen (known as The Merge).
 
-Proof-of-Stake consists in replacing the trust from computing power with the trust from holding the coins of the ecosystem, therefore prooving that someone has something to loose by beeing dishonest.
+Proof-of-Stake consists in replacing the trust from computing power with the trust from holding the coins of the ecosystem, therefore proving that someone has something to loose by being dishonest.
 
 Again, I'm not going to go further in the details of the different implementations of Proof-of-Stake, how inflation is managed in these ecosystems, that is a whole other topic. The Ethereum Foundation claims that Proof-of-Stake is more secure, less energy-intensive, and better for implementing new scaling solutions \cite{ethereum}. 
 At least, it tackles the biggest criticism on cryptocurrencies from the mainstream media, which is that Proof-of-Work uses too much power \cite{bitcoinUse}.
