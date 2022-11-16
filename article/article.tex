@@ -26,7 +26,7 @@
     urlcolor=black
 }
 
-\title{Decentralized state machine using Nakamoto (probabilistic) consensus\\\medskip Research Project 2022}
+\title{Decentralized State Machine using Nakamoto (probabilistic) Consensus\\\medskip Research Project 2022}
 \author{Nicolas COURAUD (nicolas.couraud@etu.emse.fr)\\École Nationale Supérieure des Mines de Saint-Étienne}
 
 \begin{document}
@@ -38,28 +38,28 @@
 As defined by Schneider \cite{stateMachine}, the state machine approach is a general method for implementing a fault-tolerant service
 by replicating servers and coordinating client interactions with server replicas.
 
-In this article, we will look at a new family of probabilistic consensus algorithms, in the context of building a decentralized state machine.
+In this article, we will look at a new family of probabilistic Consensus algorithms, in the context of building a decentralized state machine.
 
 We will show that it is possible to build a decentralized state machine using Nakamoto Consensus, with the Snowball protocol \cite{snowprotocol} and will compare this approach to the traditional approach with
-a classical consensus algorithm (Raft \cite{understandable})
+a classical Consensus algorithm (Raft \cite{understandable})
 
 The implementation of the project is available at \href{https://github.com/Nicolascrd/distributed-state-machine}{github.com/Nicolascrd/distributed-state-machine}
 
 
 \tableofcontents
 
-\section{Traditional state machine replication}
+\section{Traditional State Machine Replication}
 
 \subsection{Introduction}
 
 Decentralized state machine systems are currently built around classical consensus algorithms.
 
-Classical consensus algorithms were designed in the late 20th century to tackle faulty hardware and network. Their goal is to avoid one service being made unavailable by a crash or a network failure.
-In classical consensus, all of the nodes have to know each other. It is a permissioned model, which means that nodes have to get an approval to get into the network.
+Classical Consensus algorithms were designed in the late 20th century to tackle faulty hardware and network. Their goal is to avoid one service being made unavailable by a crash or a network failure.
+In classical Consensus, all of the nodes have to know each other. It is a permissioned model, which means that nodes have to get an approval to get into the network.
 Because all nodes must communicate with each other, the communication cost to reach consensus in generally considered high. That's why most of the time, the system is built with a leader/followers structure (it is the case with Raft).
 This makes the system efficient as one server can spread requests among followers to increase bandwidth and rely on them in the case of a crash. Also, while the leader is up it acts as a trusted party for both followers and the client, so it reduces the need to reach consensus at all time.
 
-Many classical consensus algorithms exists, the most famous one being Paxos \cite{parliament}.
+Many classical consensus algorithms exist, the most famous one being Paxos \cite{parliament}.
 \subsection{The Raft State Machine}
 In this project, I used the Raft consensus algorithm \cite{understandable} because it performs as well as Paxos, and is simpler to understand and implement.
 
@@ -76,20 +76,20 @@ The only parameter than I included in the classical consensus version of my stat
 it will be eliminated from the network in the knowledge of all the nodes. This makes it possible to
 crash a majority of nodes and still have the state machine running and usable on all the surviving nodes.
 
-\section{Nakamoto (probabilistic) state machine replication}
+\section{Nakamoto (probabilistic) State Machine Replication}
 \subsection{The Nakamoto Consensus}
 
-Nakamoto consensus was introduced with the bitcoin blockchain \cite{bitcoin}. It is a probabilistic type of consensus, which means that there is a probability ε that consensus is not reached.
+Nakamoto Consensus was introduced with the bitcoin blockchain \cite{bitcoin}. It is a probabilistic type of consensus, which means that there is a probability ε that consensus is not reached.
 Of course, ε can be so low that crucial systems can rely on the assumption that consensus is achieved.
 
-Nakamoto consensus is open : nodes don't have to register or get an authorisation to enter the network.
+Nakamoto Consensus is open : nodes don't have to register or get an authorisation to enter the network.
 Because nodes don't have to know every other node in the network and be able to communicate with everyone, Nakamoto is supposed to allow for greater scale in the network.
 
-Nakamoto consensus was a revolution in the consensus space with cryptocurrencies. How can we adapt the approach to build a state machine with it ?
+Nakamoto Consensus was a revolution in the consensus space with cryptocurrencies. How can we adapt the approach to build a state machine with it ?
 
-\subsection{My Nakamoto state machine implementation}
+\subsection{My Nakamoto State Machine Implementation}
 
-To implement Nakamoto consensus, I chose the Snowball consensus algorithm \cite{snowprotocol}, which underlies the Avalanche blockchain.
+To implement Nakamoto Consensus, I chose the Snowball consensus algorithm \cite{snowprotocol}, which underlies the Avalanche blockchain.
 
 The goal of Snowball is to reach binary consensus starting from a network of nodes.
 
@@ -151,7 +151,7 @@ initiateRequest corresponds to the following sequence :
 \section{Performance Evaluation}
 \subsection{Probability of not reaching consensus in Nakamoto Consensus}
 
-In order to compare the performances of classical consensus and Nakamoto consensus, we need to be able to know the probability of not reaching consensus ε corresponding to the set
+In order to compare the performances of classical consensus and Nakamoto Consensus, we need to be able to know the probability of not reaching consensus ε corresponding to the set
 of values (n, k, β). (α is not included because we assume no byzantine nodes in this section, that corresponds to the implementation).
 
 The evolution of the system of nodes, for one position (one Snowball run), is a Markov process. To compute to probability of not reaching consensus, we need to identify the possible states in the
@@ -215,7 +215,7 @@ The scripts which were used to compute the graphs in Appendices are available at
 
 \subsection{Number of requests required in regular functioning}
 
-\paragraph{Raft (classical)}
+\paragraph{Raft (Classical)}
 When the leader is up and giving instructions to all the followers, followers don't have to initiate requests.
 Therefore in normal functioning, the leader node will make $n-1$ requests every heartbeat.
 In addition to this, every client request will trigger $n-1$ requests from the leader, to update followers. If the request was directed from the client to a follower, one request is initiated
@@ -231,31 +231,31 @@ If a follower crashes, the leader stays in place. If updateSystem is activated, 
 
 If the leader crashes, nodes will switch from the follower status to the candidate status, because they don't receive the heartbeat.
 However, the number of requests that will be made to elect a new leader depends on a number of factors.
-With a few nodes, the process happens with only one request : the first node to tick (notice that the heartbeat was not received) switches to candidate status, triggers a round of vote, collects all the votes and establishes itself as the new leader.
-In the meantime, the other nodes did not switch to candidate and start receiving the heartbeats from the new leader.
+With a few nodes, the process happens with only one request : the first node to tick (notice that the heartbeat was not received) switches to candidate status, triggers a round of voting, collects all the votes and establishes itself as the new leader.
+In the meantime, the other nodes have not switched to candidate and start receiving the heartbeats from the new leader.
 With many nodes, nodes might tick "at the same time" and therefore candidate at the same time which can trigger many requests. To avoid an infinite escalation of currentTerm, which is the value incremented by each candidate, the ticker is supposed to happen randomly in some time window.
 
 Overall the Raft is very efficient at managing crash failures.
 
 \paragraph{Fail-stop in Snowball}
-With no system to update knowledge among participating nodes, nodes crashes can force nodes to use more requests to reach consensus.
+With no system to update knowledge among participating nodes, node crashes can force nodes to use more requests to reach consensus.
 Indeed, if in the sample there are enough crashed nodes to prevent the success of the request, the node will have to start a new group of requests. That requires a significant number of nodes to crash nonetheless.
 In production, the Snowball state machine would include a mechanism to update the network knowledge among members, which can take the form of a Snowball run, and therefore continue as if no node had failed.
 Snowball would then be very efficient at managing crash failures.
 
 \paragraph{Byzantine failures}
-The architecture required to test properly my implementations for byzantine failures goes beyond this project. But we can still think about the resilience of each implementation.
-With Raft, a byzantine node can easily take the control on the network by becoming the leader. It only needs to start as a follower, choose a currentTerm bigger than the current one and ask for votes, which other nodes will give.
+The architecture required to benchmark my implementations for byzantine failures goes beyond this project. But we can still think about the resilience of each implementation.
+With Raft, a byzantine node can easily take control on the network by becoming the leader. It only needs to start as a follower, choose a currentTerm bigger than the current one and ask for votes, which other nodes will give.
 Once elected leader, the byzantine node can implement any information among followers. The state machine is unusable and even potentially dangerously infected.
 
-With Avalanche, to begin with, a node cannot easily change the information that is already in place among nodes. This would require the consensus to switch from one way to the other, which is nearly impossible. However, in my implementation, the client cannot either change a log at one position.
+With Avalanche, to begin with, a node cannot easily change the information that is already in place among nodes. This would require the consensus to switch from one way to the other, which is nearly impossible. However, in my implementation, the client cannot change a log at one position either.
 One thing the byzantine node cannot easily do in the Snowball implementation is register different data among multiple nodes. Indeed, these nodes will want to verify the information by querying other nodes to reach consensus. The system will therefore go one way or the other.
 
 \section{Conclusion}
 
-We demonstrated that it was possible to build a decentralized state machine, that could be based on a Nakamoto consensus algorithm and had interesting properties.
+We demonstrated that it was possible to build a decentralized state machine, that could be based on a Nakamoto Consensus algorithm and had interesting properties.
 In normal running state, the number of requests to reach consensus with Snowball is a function of $k * \beta$ for each node. In Raft, the leader must handle $n-1$ request on its own.
-Raft has one consensus for the whole system, whereas in Snowball to each value corresponds a different consensus run. For most applications, classical consensus is probably the way to go. Still, it would be useful to lead some more research on the topic.
+Raft has one consensus for the whole system, whereas in Snowball to each value corresponds a different consensus run. For most applications, Classical Consensus is probably the way to go. Still, it would be useful to conduct some more research on the topic.
 In particular, it would be interesting to approximate the value of ε $\forall n, k, \beta$.
 A comparison focused on Byzantine Fault Tolerance would also be interesting. To do that, one would need to use PBFT \cite{pbft} instead of the Raft.
 
